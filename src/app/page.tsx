@@ -144,6 +144,7 @@ const Home = () => {
                 height={rect.height}
                 stroke={rect.stroke}
                 strokeWidth={rect.strokeWidth}
+                draggable
               />
             ))}
             {ellipse.map((ellipse,index) => (
@@ -154,6 +155,7 @@ const Home = () => {
                 radiusX={ellipse.radiusx as number}
                 radiusY={ellipse.radiusy as number}
                 stroke={ellipse.stroke}
+                draggable
                 />
             ))}
            {lines.map((line,index) => (
