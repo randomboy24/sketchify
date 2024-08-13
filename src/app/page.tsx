@@ -1,7 +1,8 @@
 "use client"
 
 import { Toolbar } from "@/components/Toolbar"
-import { useState } from "react"
+import Konva from "konva"
+import { useRef, useState } from "react"
 import { Ellipse, Layer, Line, Rect, Stage } from "react-konva"
 
 interface ShapeTypes {
@@ -33,11 +34,16 @@ const Home = () => {
     arrow:false,
     line:false,
     draw:false,
-    text:false
+    text:false,
+    eraser:false
   });
   const [isClicked, setIsClicked] = useState(false);
+  const stageRef = useRef(null);
 
   const handleMouseDown = (event: any) => {
+    if(isDrawing.eraser){
+      setIsClicked(true)
+    }
     if (isDrawing.rect) {
       setIsClicked(true);
       const stage = event.target.getStage();
@@ -76,6 +82,24 @@ const Home = () => {
   
 
   const handleMouseMove = (event: any) => {
+    if(isClicked && isDrawing.eraser){
+      const stage = stageRef.current as any;
+      const { x, y } = stage.getPointerPosition();
+
+
+      const shapes = stage.find('Shape')
+       shapes.forEach((shape:any) => {
+        console.log("hello")
+        const shapes = shape.getClientRect();
+        const cursorRect = { x, y, width: 1,height: 1};
+
+        if(Konva.Util.haveIntersection(shapes,cursorRect)){
+          shape.destroy();
+
+        }
+       })
+       stage.batchDraw();
+    }
     if (isClicked && isDrawing.rect) {
       const stage = event.target.getStage();
       const { x, y } = stage.getPointerPosition();
@@ -121,7 +145,7 @@ const Home = () => {
 
   const handleMouseUp = () => {
     setIsClicked(false);
-    setIsDrawing({...isDrawing,rect:false,ellipse:false,line:false})
+    setIsDrawing({...isDrawing,rect:false,ellipse:false,line:false,eraser:false})
   };
 
   return (
@@ -133,6 +157,7 @@ const Home = () => {
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
+          ref={stageRef}
         >
           <Layer>
             {rects.map((rect, index) => (
@@ -145,6 +170,7 @@ const Home = () => {
                 stroke={rect.stroke}
                 strokeWidth={rect.strokeWidth}
                 draggable
+                className="hover:cursor-poiner"
               />
             ))}
             {ellipse.map((ellipse,index) => (
