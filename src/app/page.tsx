@@ -2,8 +2,9 @@
 
 import { Toolbar } from "@/components/Toolbar"
 import Konva from "konva"
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Ellipse, Layer, Line, Rect, Stage } from "react-konva"
+import { json } from "stream/consumers"
 
 interface ShapeTypes {
   x: number,
@@ -40,12 +41,18 @@ const Home = () => {
   const [isClicked, setIsClicked] = useState(false);
   const stageRef = useRef(null);
 
+
+  // useEffect(() => {
+  //   setRect(JSON.parse(localStorage.getItem('rects') as string))
+  // },[])
+
   const handleMouseDown = (event: any) => {
     if(isDrawing.eraser){
       setIsClicked(true)
     }
     if (isDrawing.rect) {
       setIsClicked(true);
+      console.log("hello")
       const stage = event.target.getStage();
       const { x, y } = stage.getPointerPosition();
       setRect(rects => [...rects, {
@@ -95,7 +102,7 @@ const Home = () => {
 
         if(Konva.Util.haveIntersection(shapes,cursorRect)){
           shape.destroy();
-
+          console.log(shape)
         }
        })
        stage.batchDraw();
@@ -144,6 +151,7 @@ const Home = () => {
   };
 
   const handleMouseUp = () => {
+    localStorage.setItem('rects',JSON.stringify(rects))
     setIsClicked(false);
     setIsDrawing({...isDrawing,rect:false,ellipse:false,line:false,eraser:false})
   };
